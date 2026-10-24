@@ -45,6 +45,8 @@ final class NamazPanel {
     private String place = "";
     /** running: Home is on screen; ticking: the second tick (and the ayahs, with quranOn) are scheduled. */
     private boolean quranOn, running, ticking;
+    /** Folded away while focus is in the app grid below the dock, so the grid gets the room. */
+    private boolean collapsed;
     /** When the next namaz begins, in System.currentTimeMillis() terms; 0 when nothing is shown. */
     private long nextAt;
     /** The nextAt onDue was last called for, so a stale day (offline after midnight) asks once, not every second. */
@@ -161,13 +163,33 @@ final class NamazPanel {
         c.add(Calendar.MINUTE, day.minutes[next.index]);
         nextAt = c.getTimeInMillis();
         nextCountdown.setText(countdown(nextAt - System.currentTimeMillis()));
-        if (panel.getVisibility() != View.VISIBLE) {
+        if (!collapsed && panel.getVisibility() != View.VISIBLE) {
             panel.setAlpha(0f);
             panel.setVisibility(View.VISIBLE);
             panel.animate().alpha(1f).setDuration(400).start();
         }
         // Called every minute too: a tick already running carries on (the ayahs keep their pace).
         if (running && !ticking) restartTicks();
+    }
+
+    /**
+     * Folds the panel away (focus went down into the app grid) or brings it back (focus is on the dock again).
+     * The header shrinks or grows with it; MainActivity's grid layout listener then re-places the dock and glass.
+     * The countdown keeps ticking meanwhile, so it is right the moment the panel is back.
+     */
+    void setCollapsed(boolean collapsed) {
+        if (this.collapsed == collapsed) return;
+        this.collapsed = collapsed;
+        if (nextAt == 0) return;                 // nothing shown (switched off, or no times yet)
+        panel.animate().cancel();
+        if (collapsed) {
+            panel.animate().alpha(0f).setDuration(160).withEndAction(() -> {
+                if (this.collapsed) panel.setVisibility(View.GONE);
+            }).start();
+        } else {
+            panel.setVisibility(View.VISIBLE);
+            panel.animate().alpha(1f).setDuration(300).start();
+        }
     }
 
     void hide() {
@@ -196,7 +218,7 @@ final class NamazPanel {
     private void restartTicks() {
         handler.removeCallbacksAndMessages(null);
         ticking = false;
-        if (panel.getVisibility() != View.VISIBLE || nextAt == 0) return;
+        if (nextAt == 0) return;
         ticking = true;
         handler.post(secondTick);
         if (quranOn) handler.postDelayed(ayahTick, AYAH_MS);

@@ -776,8 +776,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             // Only when the row is actually off: a few pixels' mismatch must not start a scroll on every move.
             if (Math.abs(dy) > (int) (8 * density)) glide(dy);
             showHero(position, r.top - dy);
+            namazPanel.setCollapsed(false);
         } else {
             hideHero();
+            namazPanel.setCollapsed(true);       // the app grid gets the panel's room
+
             // Scroll just enough so the whole glass (not only the tile) is visible.
             Rect want = new Rect(0, -(int) pad * 2, item.getWidth(), item.getHeight() + (int) pad);
             grid.requestChildRectangleOnScreen(item, want, false);
