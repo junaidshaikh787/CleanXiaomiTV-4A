@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug builds only: lets adb fire the azan without waiting for a namaz time, e.g.
+       adb shell am broadcast -n com.majnioui.cleanxiaomitv/com.gathin.tvhome.Azan \
+           -a com.gathin.tvhome.action.AZAN_ALARM -\-ei prayer 4 -\-el at $(date +%s000)
+     Release builds keep both private. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application>
+        <receiver
+            android:name="com.gathin.tvhome.Azan"
+            android:exported="true"
+            tools:replace="android:exported" />
+        <activity
+            android:name="com.gathin.tvhome.AzanActivity"
+            android:exported="true"
+            tools:replace="android:exported" />
+    </application>
+</manifest>

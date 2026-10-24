@@ -175,6 +175,24 @@
                             android:fontVariationSettings="'wght' 400"
                             android:letterSpacing="0.14"
                             android:textAllCaps="true" />
+
+                        <!-- Islamic date ("13 Jumada al-Awwal 1448 AH") under the Gregorian one (hijri_date), from
+                             the same Aladhan answer as the prayer times; hidden until it has loaded. -->
+                        <TextView
+                            android:id="@+id/hijriDate"
+                            android:gravity="left"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:singleLine="true"
+                            android:ellipsize="end"
+                            android:textColor="#D9F2C879"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/outfit"
+                            android:fontVariationSettings="'wght' 400"
+                            android:letterSpacing="0.14"
+                            android:textAllCaps="true"
+                            android:visibility="gone" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -214,8 +232,8 @@
                     android:nextFocusDown="@+id/grid" />
             </LinearLayout>
 
-            <!-- Next prayer under the clock (home_prayer): moon, name, time and countdown. Glass like the pills,
-                 but not focusable: it only informs. -->
+            <!-- Namaz under the clock (home_prayer): moon, the current namaz, then the next one with its time and
+                 countdown. Glass like the pills, but not focusable: it only informs. -->
             <LinearLayout
                 android:id="@+id/prayerPill"
                 android:layout_width="wrap_content"
@@ -236,11 +254,48 @@
                     android:src="@drawable/ic_prayer"
                     android:contentDescription="@null" />
 
+                <!-- "NOW Isha 7:23 PM", gone between sunrise and Dhuhr when no namaz is current. -->
+                <LinearLayout
+                    android:id="@+id/prayerNowGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/PrayerLabel"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/prayer_now_label" />
+
+                    <TextView
+                        android:id="@+id/prayerNow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="7dp"
+                        android:singleLine="true"
+                        android:textColor="#FFF2C879"
+                        android:textSize="15sp"
+                        android:fontFamily="@font/outfit"
+                        android:fontVariationSettings="'wght' 500"
+                        android:includeFontPadding="false" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="14dp"
+                        android:layout_marginStart="12dp"
+                        android:background="#40FFFFFF" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/PrayerLabel"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/prayer_next_label" />
+
                 <TextView
                     android:id="@+id/prayerName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="7dp"
                     android:singleLine="true"
                     android:textColor="#FFFFFFFF"
                     android:textSize="15sp"
@@ -312,6 +367,17 @@
                 android:overScrollMode="never"
                 android:scrollbars="none"
                 android:descendantFocusability="afterDescendants" />
+
+            <!-- Soft top edge: rows scrolled under the header fade out instead of being cut off. Shown only
+                 once the dock band reaches the edge (MainActivity.updateGridFade); a static drawable, no layer. -->
+            <View
+                android:id="@+id/gridFade"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_gravity="top"
+                android:alpha="0"
+                android:background="@drawable/grid_top_fade"
+                android:importantForAccessibility="no" />
         </FrameLayout>
     </LinearLayout>
 

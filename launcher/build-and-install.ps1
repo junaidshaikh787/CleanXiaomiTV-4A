@@ -1,98 +1,61 @@
-# Windows version of build-and-install.sh: build the launcher APK and install it on the TV as the
-# default home screen. Uses Android Studio's bundled JDK and the default SDK location unless
-# JAVA_HOME / ANDROID_HOME are set.
+# Build the launcher and install it on the TV over adb, then open it for testing. It does not change Home,
+# disable any app, debloat or touch the TV's settings: tools\set-home.ps1 makes it the default Home, and
+# tools\disable.ps1 does the debloat, each recorded for tools\restore.ps1.
 #
-# Usage: launcher\build-and-install.ps1 -TvHost 192.168.1.50 [-StockLauncher <package>|none]
-#        The stock launcher is detected from the TV when -StockLauncher is not given.
-#        [-InputKeyService]   remote's Input / YouTube / Apps buttons work (Google TV); re-pass on every install
-#        [-HomeKeyService]    remotes whose Home button sends KEYCODE_ALL_APPS (Xiaomi sticks)
-#        [-PrivateDns <hostname>|off]  ad-blocking DNS for the whole TV, dns.adguard-dns.com by default
+# Usage: launcher\build-and-install.ps1 [-Serial <ip:5555>] [-Debug]
+#        -Debug   debug build (adds the adb test hook for the azan screen, see src\debug\AndroidManifest.xml)
+#        Uses JAVA_HOME (JDK 17+) or Android Studio's bundled JDK, and ANDROID_HOME or the default SDK folder.
 param(
-    [string]$TvHost = $env:TV_HOST,
-    [string]$StockLauncher = '',
-    [switch]$InputKeyService,
-    [switch]$HomeKeyService,
-    [string]$PrivateDns = $(if ($env:PRIVATE_DNS) { $env:PRIVATE_DNS } else { 'dns.adguard-dns.com' })
+    [string]$Serial = $env:TV_SERIAL,
+    [switch]$Debug
 )
 $ErrorActionPreference = 'Stop'
-# Pipe plain UTF-8 to native commands; the default here prepends a BOM that corrupts the first command.
-$OutputEncoding = New-Object System.Text.UTF8Encoding $false
-if (-not $TvHost) { throw 'pass -TvHost <tv ip> or set $env:TV_HOST' }
-$env:TV_HOST = $TvHost
-Set-Location $PSScriptRoot
+. (Join-Path (Split-Path -Parent $PSScriptRoot) 'tools\adb.ps1')
+$pkg = 'com.majnioui.cleanxiaomitv'
+$activity = "$pkg/com.gathin.tvhome.MainActivity"
 
+# 1. Prerequisites: a JDK 17+, the Android SDK, adb, and the TV.
+function Get-JavaMajor([string]$home_) {
+    # java -version prints to stderr; through cmd, so Windows PowerShell does not turn that into an error.
+    $v = (cmd /c "`"$home_\bin\java.exe`" -version 2>&1" | Out-String)
+    if ($v -match 'version "(\d+)') { [int]$Matches[1] } else { 0 }
+}
 if (-not $env:JAVA_HOME -or -not (Test-Path "$env:JAVA_HOME\bin\java.exe")) {
     $jbr = Get-ChildItem 'C:\Program Files\Android' -Directory -ErrorAction SilentlyContinue |
         ForEach-Object { Join-Path $_.FullName 'jbr' } | Where-Object { Test-Path "$_\bin\java.exe" } | Select-Object -First 1
-    if (-not $jbr) { throw 'Set JAVA_HOME to a JDK 17+ (Android Studio ships one in its jbr folder)' }
+    if (-not $jbr) { throw 'No JDK found: set JAVA_HOME to a JDK 17 or newer (Android Studio ships one in its jbr folder).' }
     $env:JAVA_HOME = $jbr
 }
+$javaMajor = Get-JavaMajor $env:JAVA_HOME
+if ($javaMajor -lt 17) { throw "JAVA_HOME ($env:JAVA_HOME) is Java $javaMajor; the build needs 17 or newer." }
 $sdk = if ($env:ANDROID_HOME) { $env:ANDROID_HOME } else { "$env:LOCALAPPDATA\Android\Sdk" }
-if (-not (Test-Path local.properties)) {
-    "sdk.dir=$($sdk -replace '\\', '\\')" | Out-File -Encoding ascii local.properties
+if (-not (Test-Path "$sdk\platforms\android-34")) { throw "Android SDK platform 34 not found in $sdk (sdkmanager `"platforms;android-34`" `"build-tools;34.0.0`")." }
+Set-Location $PSScriptRoot
+if (-not (Test-Path local.properties)) { "sdk.dir=$($sdk -replace '\\', '\\')" | Out-File -Encoding ascii local.properties }
+$Serial = Resolve-TvSerial $Serial
+Write-Host "Java $javaMajor, SDK $sdk, TV $Serial"
+
+# 2. Build, and check the result before anything goes to the TV.
+$task = if ($Debug) { 'assembleDebug' } else { 'assembleRelease' }
+& .\gradlew.bat $task -q --console=plain
+if ($LASTEXITCODE -ne 0) { throw "Gradle $task failed" }
+$apk = if ($Debug) { 'app\build\outputs\apk\debug\app-debug.apk' } else { 'app\build\outputs\apk\release\app-release.apk' }
+if (-not (Test-Path $apk)) { throw "build reported success but $apk is missing" }
+$aapt = Get-ChildItem "$sdk\build-tools" -Directory | Sort-Object Name -Descending |
+    ForEach-Object { Join-Path $_.FullName 'aapt.exe' } | Where-Object { Test-Path $_ } | Select-Object -First 1
+if ($aapt) {
+    $badging = (& $aapt dump badging $apk) -join "`n"
+    if ($badging -notmatch "package: name='$pkg'") { throw "$apk is not $pkg" }
+    $minSdk = if ($badging -match "sdkVersion:'(\d+)'") { [int]$Matches[1] } else { 0 }
+    $tvSdk = [int](Invoke-Tv $Serial 'getprop ro.build.version.sdk').Out.Trim()
+    if ($minSdk -gt $tvSdk) { throw "the APK needs Android SDK $minSdk; the TV has $tvSdk" }
+    Write-Host "Built $apk ($([math]::Round((Get-Item $apk).Length / 1MB, 1)) MB), minSdk $minSdk, TV SDK $tvSdk"
 }
 
-.\gradlew.bat assembleRelease -q --console=plain
-if ($LASTEXITCODE -ne 0) { throw 'Gradle build failed' }
-
-$py = '..\tools\venv\Scripts\python.exe'
-# Which app owns Home differs by build; ask the TV, but only accept a launcher we recognise (the answer
-# can also be Android's chooser "android", the setup wizard, or another third-party launcher).
-$knownStock = @('com.google.android.tvlauncher', 'com.google.android.apps.tv.launcherx', 'com.google.android.leanbacklauncher', 'com.gathin.tvhome')   # last: the original CleanYourTV launcher
-if (-not $StockLauncher) {
-    $homePkg = & $py -I ..\tools\tv.py 'cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME' | Select-Object -Last 1
-    if ($LASTEXITCODE -ne 0 -or -not $homePkg) { throw 'could not ask the TV which launcher owns Home; check -TvHost and the debugging prompt, or pass -StockLauncher <package>' }
-    $homePkg = "$homePkg".Trim().Split('/')[0]
-    if ($knownStock -contains $homePkg) { $StockLauncher = $homePkg }
-    elseif ($homePkg -eq 'com.majnioui.cleanxiaomitv') { $StockLauncher = 'none'; Write-Host 'Home already belongs to this launcher; nothing will be disabled.' }
-    elseif ($homePkg -eq 'android') {
-        # Android's chooser: launchers tie and no default is set (a restore followed by a re-applied list
-        # ends here). Take the one known stock launcher among the HOME claimants, if there is exactly one.
-        $claimants = (& $py -I ..\tools\tv.py 'cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME') -join "`n"
-        $found = @($knownStock | Where-Object { $claimants -match ([regex]::Escape($_) + '/') })
-        if ($found.Count -eq 1) { $StockLauncher = $found[0]; Write-Host "Home is Android's chooser; the stock launcher among the candidates is $StockLauncher." }
-        else { throw "Home is Android's launcher chooser and $($found.Count) known stock launchers claim Home: pick a default on the TV first, or run again with -StockLauncher <package to disable> or -StockLauncher none." }
-    }
-    else { throw "Home currently resolves to '$homePkg', which is not a stock launcher this script knows (android = launcher chooser, com.google.android.tungsten.setupwraith = setup wizard, see docs/TROUBLESHOOTING.md; anything else = another launcher is the default). Run again with -StockLauncher <package to disable> or -StockLauncher none." }
-}
-Write-Host "Stock launcher: $StockLauncher"
-$disableStock = if ($StockLauncher -eq 'none') { 'echo stock launcher left alone' } else { "pm disable-user --user 0 $StockLauncher" }
-
-$apk = 'app\build\outputs\apk\release\app-release.apk'
-& $py -I ..\tools\b64push.py $apk /data/local/tmp/tvhome.apk
-if ($LASTEXITCODE -ne 0) { throw 'APK upload failed' }
-$out = & $py -I ..\tools\tv.py 'pm install -r /data/local/tmp/tvhome.apk; rm -f /data/local/tmp/tvhome.apk'
-Write-Host $out
-if ("$out" -notmatch 'Success') { throw 'pm install failed; the stock launcher was left untouched' }
-# Android 9 only accepts a component here; Android 10+ also takes a bare package name.
-$out = & $py -I ..\tools\tv.py 'cmd package set-home-activity --user 0 com.majnioui.cleanxiaomitv/com.gathin.tvhome.MainActivity'
-Write-Host $out
-if ("$out" -match 'Error') { throw 'could not set the new launcher as home; the stock launcher was left untouched' }
-@(
-    'pm grant com.majnioui.cleanxiaomitv android.permission.ACCESS_FINE_LOCATION 2>/dev/null; echo location-granted',
-    'cmd notification allow_listener com.majnioui.cleanxiaomitv/com.gathin.tvhome.MediaListener; echo now-playing-allowed',
-    'cmd package compile -m speed -f com.majnioui.cleanxiaomitv',
-    "am start -W -n com.majnioui.cleanxiaomitv/com.gathin.tvhome.MainActivity | grep -E '^(Status|Error)'",
-    $disableStock,
-    'cmd package set-home-activity --user 0 com.majnioui.cleanxiaomitv/com.gathin.tvhome.MainActivity'
-) | & $py -I ..\tools\tv.py --batch
-# Order matters, see build-and-install.sh: start the new launcher, disable the stock one, set the
-# preference last, then check where Home ended up and put the stock launcher back if it is not ours.
-$homeNow = (& $py -I ..\tools\tv.py 'cmd package resolve-activity --brief -c android.intent.category.HOME -a android.intent.action.MAIN' | Select-Object -Last 1).Trim()
-if ($homeNow -notlike 'com.majnioui.cleanxiaomitv/*') {
-    if ($StockLauncher -ne 'none') { & $py -I ..\tools\tv.py "pm enable --user 0 $StockLauncher" | Out-Null }
-    throw "Home resolves to '$homeNow', not to the new launcher; $StockLauncher was re-enabled. On Google TV this usually means com.google.android.tungsten.setupwraith also claims Home: add it to your debloat list (see docs/TROUBLESHOOTING.md), apply it, then run this script again."
-}
-Write-Host "Home now resolves to $homeNow"
-# Ad-blocking DNS, see build-and-install.sh. tools\restore.ps1 switches it back.
-if ($PrivateDns -ne 'off') {
-    & $py -I ..\tools\tv.py "settings put global private_dns_specifier $PrivateDns; settings put global private_dns_mode hostname; echo Private DNS: $PrivateDns"
-}
-# Optional accessibility services, appended to enabled_accessibility_services without dropping others.
-function Enable-Service([string]$Name) {
-    $svc = "com.majnioui.cleanxiaomitv/com.gathin.tvhome.$Name"
-    & $py -I ..\tools\tv.py ('s=$(settings get secure enabled_accessibility_services); case "$s" in *' + $Name + '*) ;; null|"") settings put secure enabled_accessibility_services ' + $svc + ' ;; *) settings put secure enabled_accessibility_services "$s:' + $svc + '" ;; esac; settings put secure accessibility_enabled 1; echo ' + $Name + ' enabled')
-}
-if ($InputKeyService) { Enable-Service 'InputKeyService' }
-if ($HomeKeyService) { Enable-Service 'HomeKeyService' }
-Write-Host 'Installed. Press Home on the remote to see it.'
+# 3. Install (replacing only an earlier build of this launcher) and open it.
+$r = Invoke-Adb $Serial "install -r `"$((Resolve-Path $apk).Path)`""
+if ($r.Out -notmatch 'Success') { throw "install failed: $($r.Out.Trim()) $($r.Err.Trim())" }
+Write-Host 'Installed.'
+$r = Invoke-Tv $Serial "am start -W -n $activity"
+if ($r.Out -notmatch 'Status: ok') { throw "installed, but it did not open: $($r.Out.Trim())" }
+Write-Host 'Opened on the TV. Make it the default Home with tools\set-home.ps1 (see README).'

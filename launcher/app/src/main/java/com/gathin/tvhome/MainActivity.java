@@ -128,8 +128,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     /** Prayer pill under the clock (home_prayer); switched from the Settings menu. */
     private boolean homePrayer;
     private String prayerLat, prayerLon;
-    private int prayerMethod;
-    private View prayerPill;
+    private int prayerMethod, prayerSchool, hijriAdjustment;
+    private boolean hijriOn;
+    private View prayerPill, prayerNowGroup;
+    private TextView prayerNow, hijriDate;
     private TextView prayerName, prayerTime, prayerLeft;
     private ImageView prayerIcon;
     /** The last times loaded; kept past midnight until the new day's arrive, a minute out at most. */
@@ -290,13 +292,19 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         prayerName = findViewById(R.id.prayerName);
         prayerTime = findViewById(R.id.prayerTime);
         prayerLeft = findViewById(R.id.prayerLeft);
+        prayerNowGroup = findViewById(R.id.prayerNowGroup);
+        prayerNow = findViewById(R.id.prayerNow);
+        hijriDate = findViewById(R.id.hijriDate);
         prayerPill.setBackground(new GlassDrawable(prayerPill, backdrop, 19 * density, density));
-        // Prayer times use the weather coordinates; without them there is nothing to show.
-        if (!cfg.weatherLatitude.isEmpty() && !cfg.weatherLongitude.isEmpty()) {
-            prayerLat = cfg.weatherLatitude;
-            prayerLon = cfg.weatherLongitude;
+        // Prayer times use the prayer coordinates (Config falls back to the weather's); without any, nothing shows.
+        if (!cfg.prayerLatitude.isEmpty() && !cfg.prayerLongitude.isEmpty()) {
+            prayerLat = cfg.prayerLatitude;
+            prayerLon = cfg.prayerLongitude;
         }
         prayerMethod = cfg.prayerMethod;
+        prayerSchool = cfg.prayerSchool;
+        hijriOn = cfg.hijriDate;
+        hijriAdjustment = cfg.hijriAdjustment;
         homePrayer = cfg.homePrayer && prayerLat != null;
         dockApps = DockEditor.loadDock(this, cfg.dockApps, COLUMNS);
         appOrder = DockEditor.loadAppOrder(this, dockApps);
@@ -377,12 +385,16 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             if (grid.getPaddingTop() != want) {
                 grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
             }
+            // The header can grow after the first layout (the namaz pill and Islamic date arrive with the
+            // day's times), which shrinks the grid: park the dock again and move the glass with its tile.
+            if (ob - ot > 0 && h != ob - ot) grid.post(this::replaceGlass);
         });
 
         // Keep the glass glued to its tile while the grid scrolls.
         grid.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
+                updateGridFade();
                 if (!glassShown) return;
                 glassTargetY -= dy;
                 glassScrollShift -= dy;
@@ -551,6 +563,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     protected void onResume() {
         super.onResume();
         promptsPaused = false;
+        // Keeps the next azan alarm in step with today's times and the switches (cheap; off the main thread).
+        Azan.scheduleAsync(this);
         switch (tileRefresh.onResume(packagesChangedSinceRebuild())) {
             case REBUILD:
                 tilesReady = false;
@@ -784,6 +798,18 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         grid.smoothScrollBy(0, dy, GLIDE, ms);
     }
 
+    /**
+     * Fades in the soft top edge as the dock band (the grid's first row, 6dp of band above its item)
+     * slides under the header, so a 720p screen shows a fade there rather than a hard cut.
+     */
+    private void updateGridFade() {
+        View fade = findViewById(R.id.gridFade);
+        RecyclerView.LayoutManager lm = grid.getLayoutManager();
+        View first = lm == null ? null : lm.findViewByPosition(0);
+        float under = first == null ? Float.MAX_VALUE : -(first.getTop() - 6 * density);
+        fade.setAlpha(Math.max(0f, Math.min(1f, under / (24 * density))));
+    }
+
     // ---- top shelf -------------------------------------------------------------------------------
 
     private void showHero(int position, float dockTopInRoot) {
@@ -885,6 +911,15 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         heroName.animate().alpha(0f).setDuration(260).setInterpolator(GLIDE).start();
         findViewById(R.id.photoCaption).animate().alpha(0f).setDuration(260).start();
         ambient.animate().alpha(0f).setDuration(600).setInterpolator(GLIDE).start();
+    }
+
+    /** Runs the focused tile's placement again (dock parking, glass), e.g. after the grid changed size. */
+    private void replaceGlass() {
+        View focus = getCurrentFocus();
+        if (focus == null || focus.getId() != R.id.card) return;
+        View item = grid.findContainingItemView(focus);
+        int pos = item == null ? RecyclerView.NO_POSITION : grid.getChildAdapterPosition(item);
+        if (pos != RecyclerView.NO_POSITION) onTileFocused(pos, focus);
     }
 
     private void hideGlass() {
@@ -1035,8 +1070,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                 updatePrayer();
             });
             addToggleRow(rows, R.drawable.ic_prayer, R.string.toggle_dream_prayer, Config.DREAM_PRAYER, cfg.dreamPrayer, null);
+            // Read fresh: this menu's cfg is from onCreate, and the switch may have changed since.
+            addToggleRow(rows, R.drawable.ic_prayer, R.string.toggle_azan, Config.AZAN, Config.load(this).azan,
+                    on -> Azan.scheduleAsync(this));
         }
-        addToggleRow(rows, R.drawable.ic_athkar, R.string.toggle_dream_athkar, Config.DREAM_ATHKAR, cfg.dreamAthkar, null);
         addToggleRow(rows, R.drawable.ic_clock, R.string.toggle_dream_analog, Config.DREAM_ANALOG, cfg.dreamAnalog, null);
 
         for (int i = 0; i < rows.getChildCount(); i++) {
@@ -1339,21 +1376,35 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     /** Gold for the moon and for a prayer that is due: warm against the photo, unlike the green of "connected". */
     static final int PRAYER_GOLD = 0xFFF2C879;
 
-    /** Updates the pill every minute; today's times come from the saved file, or once a day from Aladhan. */
+    /**
+     * Updates the pill and the Islamic date every minute: the current namaz (gold), then the next one with its time
+     * and countdown. Today's times come from the saved file, or once a day from Aladhan.
+     */
     private void updatePrayer() {
         if (!homePrayer) {
             prayerPill.setVisibility(View.GONE);
+            hijriDate.setVisibility(View.GONE);
             return;
         }
-        String key = Prayer.key(prayerLat, prayerLon, prayerMethod);
+        String key = Prayer.key(prayerLat, prayerLon, prayerMethod, prayerSchool);
         if (prayerDay == null || !prayerDay.key.equals(key)) {
             Prayer.Day saved = Prayer.cached(this, key);
             if (saved != null) prayerDay = saved;
             else fetchPrayer();
         }
         if (prayerDay == null) return;
-        Prayer.Next next = Prayer.next(prayerDay);
-        boolean due = next.minutesLeft <= Prayer.NOW_MINUTES;   // the last quarter hour, and "now"
+        String hijri = hijriOn ? Prayer.hijri(this, prayerDay, hijriAdjustment) : null;
+        hijriDate.setText(hijri);
+        hijriDate.setVisibility(hijri != null ? View.VISIBLE : View.GONE);
+        int current = Prayer.current(prayerDay);
+        if (current >= 0) {
+            prayerNow.setText(Prayer.name(this, current) + "  " + Prayer.time(this, prayerDay.minutes[current]));
+            prayerNowGroup.setVisibility(View.VISIBLE);
+        } else {
+            prayerNowGroup.setVisibility(View.GONE);
+        }
+        Prayer.Next next = Prayer.upcoming(prayerDay);
+        boolean due = next.minutesLeft <= Prayer.NOW_MINUTES;   // the last quarter hour before it
         prayerName.setText(Prayer.name(this, next.index));
         prayerName.setTextColor(due ? PRAYER_GOLD : 0xFFFFFFFF);
         prayerTime.setText(Prayer.time(this, prayerDay.minutes[next.index]));
@@ -1374,9 +1425,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         prayerAt = now;
         prayerLoading = true;
         final String lat = prayerLat, lon = prayerLon;
-        final int method = prayerMethod;
+        final int method = prayerMethod, school = prayerSchool;
         new Thread(() -> {
-            Prayer.Day day = Prayer.fetch(getApplicationContext(), lat, lon, method);
+            Prayer.Day day = Prayer.fetch(getApplicationContext(), lat, lon, method, school);
             handler.post(() -> {
                 prayerLoading = false;
                 if (day == null) return;

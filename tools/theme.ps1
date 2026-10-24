@@ -1,37 +1,40 @@
-# Windows version of theme.sh: push a theme folder (config.json and optionally wallpaper.jpg) to the
-# launcher on the TV and restart Home. See themes/README.md for the keys.
+# Push a theme folder (config.json and optionally wallpaper.jpg) to the launcher on the TV and restart Home,
+# no rebuild needed. See themes/README.md for the keys. -Reset removes the theme again.
 #
-# Usage: tools\theme.ps1 -TvHost 192.168.1.50 themes\aurora
-#        tools\theme.ps1 -TvHost 192.168.1.50 -Reset
+# Usage: tools\theme.ps1 themes\aurora [-Serial <ip:5555>]
+#        tools\theme.ps1 -Reset [-Serial <ip:5555>]
 param(
     [Parameter(Position = 0)][string]$Theme,
     [switch]$Reset,
-    [string]$TvHost = $env:TV_HOST
+    [string]$Serial = $env:TV_SERIAL
 )
 $ErrorActionPreference = 'Stop'
-$OutputEncoding = New-Object System.Text.UTF8Encoding $false
-if (-not $TvHost) { throw 'pass -TvHost <tv ip> or set $env:TV_HOST' }
-$env:TV_HOST = $TvHost
-# Resolve the theme folder against the caller's directory before moving into tools\.
-if ($Theme) { $Theme = (Resolve-Path $Theme).Path }
-Set-Location $PSScriptRoot
-$py = 'venv\Scripts\python.exe'
-if (-not (Test-Path $py)) { throw 'run: python -m venv tools\venv; tools\venv\Scripts\python.exe -m pip install -r tools\requirements.txt' }
+. (Join-Path $PSScriptRoot 'adb.ps1')
+$Serial = Resolve-TvSerial $Serial
 $pkg = 'com.majnioui.cleanxiaomitv'
+$restart = "am force-stop $pkg; am start -n $pkg/com.gathin.tvhome.MainActivity >/dev/null"
 $dir = "/sdcard/Android/data/$pkg/files"
 
 if ($Reset) {
-    & $py -I tv.py "rm -f $dir/config.json $dir/wallpaper.jpg; am force-stop $pkg; am start -n $pkg/.MainActivity >/dev/null; echo reset"
+    Invoke-Tv $Serial "rm -f $dir/config.json $dir/wallpaper.jpg; $restart" | Out-Null
+    Write-Host 'Theme removed; the launcher uses config.xml again.'
     exit 0
 }
 if (-not $Theme) { throw 'usage: theme.ps1 <theme folder> | -Reset' }
+$Theme = (Resolve-Path $Theme).Path
 $config = Join-Path $Theme 'config.json'
 if (-not (Test-Path $config)) { throw "no config.json in $Theme" }
 try { Get-Content $config -Raw | ConvertFrom-Json | Out-Null } catch { throw "$config is not valid JSON" }
 
-& $py -I tv.py "mkdir -p $dir" | Out-Null
-& $py -I tv.py --push $config "$dir/config.json"
+Invoke-Tv $Serial "mkdir -p $dir" | Out-Null
+$r = Invoke-Adb $Serial "push `"$config`" $dir/config.json"
+if ($r.Code -ne 0) { throw "could not push config.json: $($r.Err.Trim())" }
 $wall = Join-Path $Theme 'wallpaper.jpg'
-if (Test-Path $wall) { & $py -I b64push.py $wall "$dir/wallpaper.jpg" } else { & $py -I tv.py "rm -f $dir/wallpaper.jpg" | Out-Null }
-& $py -I tv.py "am force-stop $pkg; am start -n $pkg/.MainActivity >/dev/null; echo applied"
-Write-Host "Theme $(Split-Path $Theme -Leaf) is on the TV. Undo with: tools\theme.ps1 -TvHost $TvHost -Reset"
+if (Test-Path $wall) {
+    $r = Invoke-Adb $Serial "push `"$wall`" $dir/wallpaper.jpg"
+    if ($r.Code -ne 0) { throw "could not push wallpaper.jpg: $($r.Err.Trim())" }
+} else {
+    Invoke-Tv $Serial "rm -f $dir/wallpaper.jpg" | Out-Null
+}
+Invoke-Tv $Serial $restart | Out-Null
+Write-Host "Theme $(Split-Path $Theme -Leaf) is on the TV. Undo with: tools\theme.ps1 -Reset"

@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- Weather on the home screen (Open-Meteo, see config.xml). -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Azan: reschedule the next azan alarm after a reboot (Azan). -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Android 11+ package visibility: lets the launcher list the TV apps it shows as tiles, and the
          apps that declare a module card (docs/specs/card.md). -->
@@ -99,6 +101,27 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
+
+        <!-- Azan at namaz times: the alarm, rescheduled after boot, a clock change and an update (Azan), and the
+             full-screen azan screen in its own task, so closing it returns to whatever was on (AzanActivity). -->
+        <receiver
+            android:name=".Azan"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <activity
+            android:name=".AzanActivity"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:taskAffinity="com.majnioui.cleanxiaomitv.azan"
+            android:excludeFromRecents="true"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
 
         <!-- The remote's Input, YouTube and Apps buttons; see InputKeyService. -->
         <service

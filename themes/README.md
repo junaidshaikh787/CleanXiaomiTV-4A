@@ -7,7 +7,7 @@ launcher's dock, layout and look on the TV without rebuilding the APK: the launc
 ```bash
 TV_HOST=192.168.1.50 tools/theme.sh themes/aurora          # push a theme and restart Home
 TV_HOST=192.168.1.50 tools/theme.sh --reset                # back to the built-in config.xml
-powershell -ExecutionPolicy Bypass -File tools\theme.ps1 -TvHost 192.168.1.50 themes\aurora
+powershell -ExecutionPolicy Bypass -File tools\theme.ps1 -Serial 192.168.1.50:5555 themes\aurora
 ```
 
 | Theme | What it does |
@@ -34,11 +34,14 @@ is ignored, and a file that doesn't parse is ignored as a whole, so a theme can 
 | `dock_opacity` | 0 to 100 | How opaque the dock band's glass is over the photo or wallpaper: 100 is the solid frosted band, lower shows more of the picture (55 by default) |
 | `advanced_effects` | bool | The focused tile lifts with a shadow, zooms a little more, its picture zooms and it gets a bright edge; the top buttons zoom on focus and apps open with a soft transition (`false` by default) |
 | `shamsi_date` | bool | Show the Solar Hijri date above the Gregorian one |
-| `dream_athkar` | bool | Adhkar at the bottom of the Clock screensaver, a new one every minute |
-| `home_prayer` | bool | Next prayer and a countdown in a glass pill under the clock, at the weather coordinates (Aladhan) |
+| `home_prayer` | bool | The current namaz, and the next one with a countdown, in a glass pill under the clock (Aladhan) |
 | `dream_analog` | bool | An analog clock on the Clock screensaver instead of the digital one |
 | `dream_prayer` | bool | Today's prayer times on the Clock screensaver, the next one lit |
-| `prayer_method` | number | Aladhan calculation method, e.g. 21 Morocco, 3 Muslim World League, 2 ISNA |
+| `prayer_latitude`, `prayer_longitude` | string | Where namaz times are calculated; empty uses the weather coordinates |
+| `prayer_method` | number | Aladhan calculation method, e.g. 1 Karachi, 3 Muslim World League, 2 ISNA, 21 Morocco |
+| `prayer_school` | 0 or 1 | Asr: 1 Hanafi (later), 0 Shafi'i |
+| `hijri_date` | bool | The Islamic (Hijri) date under the Gregorian one; needs `home_prayer` |
+| `hijri_adjustment` | -2 to 2 | Days added to the Hijri date when the local moon sighting differs |
 | `dream_photos` | bool | Photos of the day (Bing) behind the Clock screensaver, a new one every 3 minutes |
 | `now_playing` | bool | The song a music app is playing: a pill on the home screen and a panel on the screensaver |
 | `module_cards` | bool | Look for module cards and ask about them (`true`); `false` turns the feature off |

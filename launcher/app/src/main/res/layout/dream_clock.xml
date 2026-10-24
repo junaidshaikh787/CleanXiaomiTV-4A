@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Screensaver (ClockDream): clock and date that drift around a black screen over an ambient glow, or over
-     photos of the day (dream_photos), with the weather and, near the bottom, athkar (dream_athkar). -->
+     photos of the day (dream_photos), with the weather. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -213,37 +213,4 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Bottom right: a thikr and its source (dream_athkar), right-aligned. -->
-    <LinearLayout
-        android:id="@+id/dreamAthkar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginBottom="44dp"
-        android:layout_marginEnd="56dp"
-        android:gravity="right"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/dreamThikr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:maxWidth="460dp"
-            android:gravity="right"
-            android:maxLines="4"
-            android:ellipsize="end"
-            android:lineSpacingMultiplier="1.25"
-            android:textColor="#E6FFFFFF"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/dreamThikrSource"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="right"
-            android:textColor="#73FFFFFF"
-            android:textSize="15sp" />
-    </LinearLayout>
 </FrameLayout>

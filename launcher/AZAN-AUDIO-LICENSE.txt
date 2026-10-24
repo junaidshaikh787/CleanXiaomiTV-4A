@@ -1,0 +1,11 @@
+launcher/app/src/main/res/raw/azan_madinah.ogg
+
+"Call to prayer from the prophet's mosque" (Islamic call to prayer from the Prophet's Mosque, Madinah)
+by ejaz215, from Wikimedia Commons:
+https://commons.wikimedia.org/wiki/File:33937_ejaz215_call-to-prayer-from-the-prophet-s-mo.ogg
+
+Licensed under Creative Commons Attribution 3.0 Unported (CC BY 3.0):
+https://creativecommons.org/licenses/by/3.0/
+
+The recording is unchanged; only the file was renamed. SHA-1 of the file as downloaded from Commons:
+4aa432b9e44804e7d72af4429bd743aa5fa9e3a4 (2,974,689 bytes).

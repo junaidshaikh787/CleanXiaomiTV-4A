@@ -63,7 +63,6 @@
     <string name="card_state_new_label">New name</string>
     <string name="toggle_home_prayer">Prayer times on Home</string>
     <string name="toggle_dream_prayer">Prayer times on screensaver</string>
-    <string name="toggle_dream_athkar">Athkar on screensaver</string>
     <string name="toggle_dream_analog">Analog clock on screensaver</string>
     <string name="toggle_on">On</string>
     <string name="toggle_off">Off</string>
@@ -77,6 +76,30 @@
     <string name="prayer_hours_minutes">%1$d h %2$d min</string>
     <string name="prayer_minutes">%1$d min</string>
     <string name="prayer_now">now</string>
+    <!-- Small caps labels in the namaz pill: the current namaz, then the next one. -->
+    <string name="prayer_now_label">Now</string>
+    <string name="prayer_next_label">Next</string>
+    <!-- Azan screen at namaz times, and its switch in the Settings menu. -->
+    <string name="azan_title">Azan</string>
+    <string name="azan_at">Namaz time · %1$s</string>
+    <string name="azan_hint">Press OK or Back to stop the azan</string>
+    <string name="toggle_azan">Azan at namaz times</string>
+    <!-- Islamic date under the Gregorian one: day, month name, year. -->
+    <string name="hijri_date_format">%1$d %2$s %3$d AH</string>
+    <string-array name="hijri_months">
+        <item>Muharram</item>
+        <item>Safar</item>
+        <item>Rabi al-Awwal</item>
+        <item>Rabi al-Thani</item>
+        <item>Jumada al-Awwal</item>
+        <item>Jumada al-Thani</item>
+        <item>Rajab</item>
+        <item>Shaban</item>
+        <item>Ramadan</item>
+        <item>Shawwal</item>
+        <item>Dhul Qadah</item>
+        <item>Dhul Hijjah</item>
+    </string-array>
     <string name="dock_list">Dock apps and order</string>
     <string name="dock_edit_place_hint">EDIT DOCK  •  CHOOSE A PLACE, THEN OK  •  BACK EXIT</string>
     <string name="dock_edit_app_hint">EDIT DOCK  •  CHOOSE THE APP FOR THIS PLACE, THEN OK  •  BACK</string>

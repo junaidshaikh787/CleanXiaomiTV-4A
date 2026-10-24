@@ -1,0 +1,154 @@
+{
+    "device":  "MiTV4I (magnolia), Android 9, PI.3698 release-keys",
+    "original_home":  "com.google.android.tvlauncher/.MainActivity",
+    "packages":  [
+                     {
+                         "package":  "com.miui.tv.analytics",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:51:44"
+                     },
+                     {
+                         "package":  "com.google.android.feedback",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:51:50"
+                     },
+                     {
+                         "package":  "com.mitv.tvhome.oemtab",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:51:54"
+                     },
+                     {
+                         "package":  "com.mitv.tvhome.michannel",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:51:58"
+                     },
+                     {
+                         "package":  "com.mitv.tvhome.mitvplus",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:03"
+                     },
+                     {
+                         "package":  "android.autoinstalls.config.xiaomi.amelie",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:08"
+                     },
+                     {
+                         "package":  "android.autoinstalls.config.xioami.dangal",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:12"
+                     },
+                     {
+                         "package":  "co.sensara.tv.mitv",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:13"
+                     },
+                     {
+                         "package":  "co.sensara.tv.mitv.res",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:15"
+                     },
+                     {
+                         "package":  "com.google.android.youtube.tvmusic",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:17"
+                     },
+                     {
+                         "package":  "com.google.android.play.games",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:19"
+                     },
+                     {
+                         "package":  "com.google.android.videos",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:21"
+                     },
+                     {
+                         "package":  "com.xiaomi.mimusic2",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:23"
+                     },
+                     {
+                         "package":  "com.android.gallery3d",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:24"
+                     },
+                     {
+                         "package":  "com.android.camera2",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:25"
+                     },
+                     {
+                         "package":  "org.chromium.webview_shell",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:26"
+                     },
+                     {
+                         "package":  "com.android.printspooler",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:27"
+                     },
+                     {
+                         "package":  "com.android.dreams.basic",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:28"
+                     },
+                     {
+                         "package":  "com.mitv.tvhome.atv",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T19:52:57"
+                     },
+                     {
+                         "package":  "com.google.android.tvlauncher",
+                         "before":  "enabled",
+                         "action":  "disable-user",
+                         "at":  "2026-10-24T20:24:11"
+                     }
+                 ],
+    "settings":  [
+                     {
+                         "namespace":  "secure",
+                         "key":  "location_providers_allowed",
+                         "before":  "null",
+                         "set":  "gps",
+                         "at":  "2026-10-24T20:25:53"
+                     },
+                     {
+                         "namespace":  "secure",
+                         "key":  "location_mode",
+                         "before":  "null",
+                         "set":  "3",
+                         "at":  "2026-10-24T20:25:53"
+                     }
+                 ],
+    "home":  {
+                 "before":  "com.google.android.tvlauncher/.MainActivity",
+                 "set":  "com.majnioui.cleanxiaomitv/com.gathin.tvhome.MainActivity",
+                 "at":  "2026-10-24T20:22:03"
+             },
+    "permissions":  [
+                        {
+                            "package":  "com.majnioui.cleanxiaomitv",
+                            "permission":  "android.permission.ACCESS_FINE_LOCATION",
+                            "at":  "2026-10-24T20:22:03"
+                        }
+                    ]
+}

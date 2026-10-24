@@ -63,7 +63,6 @@
     <string name="card_state_new_label">اسم جديد</string>
     <string name="toggle_home_prayer">مواقيت الصلاة في الرئيسية</string>
     <string name="toggle_dream_prayer">مواقيت الصلاة في شاشة التوقف</string>
-    <string name="toggle_dream_athkar">الأذكار في شاشة التوقف</string>
     <string name="toggle_dream_analog">ساعة بعقارب في شاشة التوقف</string>
     <string name="toggle_on">مفعّل</string>
     <string name="toggle_off">معطّل</string>
@@ -77,6 +76,27 @@
     <string name="prayer_hours_minutes">%1$d س %2$d د</string>
     <string name="prayer_minutes">%1$d د</string>
     <string name="prayer_now">الآن</string>
+    <string name="prayer_now_label">الآن</string>
+    <string name="prayer_next_label">التالية</string>
+    <string name="hijri_date_format">%1$d %2$s %3$d هـ</string>
+    <string name="azan_title">الأذان</string>
+    <string name="azan_at">وقت الصلاة · %1$s</string>
+    <string name="azan_hint">اضغط موافق أو رجوع لإيقاف الأذان</string>
+    <string name="toggle_azan">الأذان في أوقات الصلاة</string>
+    <string-array name="hijri_months">
+        <item>محرم</item>
+        <item>صفر</item>
+        <item>ربيع الأول</item>
+        <item>ربيع الآخر</item>
+        <item>جمادى الأولى</item>
+        <item>جمادى الآخرة</item>
+        <item>رجب</item>
+        <item>شعبان</item>
+        <item>رمضان</item>
+        <item>شوال</item>
+        <item>ذو القعدة</item>
+        <item>ذو الحجة</item>
+    </string-array>
     <string name="dock_list">تطبيقات الشريط وترتيبها</string>
     <string name="dock_edit_place_hint">تعديل الشريط  •  اختر مكانًا ثم OK  •  رجوع للخروج</string>
     <string name="dock_edit_app_hint">تعديل الشريط  •  اختر التطبيق لهذا المكان ثم OK  •  رجوع</string>

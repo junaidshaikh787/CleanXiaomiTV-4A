@@ -1,0 +1,39 @@
+# Mi TV 4A (firmware model MiTV4I, magnolia), Android TV 9, build PI.3698, 1 GB RAM.
+# Packages disabled for user 0 (never uninstalled). Lines starting with # are not applied.
+#
+# Apply:  tools\disable.ps1 debloat-mitv4a.txt      (one package at a time, recorded in manifest\mi-tv-4a.json)
+# Undo:   tools\restore.ps1                         (re-enables exactly what the manifest lists)
+#
+# Kept on purpose (owner's choice or needed): Chromecast (com.google.android.apps.mediashell), Miracast /
+# Mi screen mirroring (com.mitv.milinkservice), firmware updates (com.xiaomi.mitv.updateservice), Live TV
+# (com.android.tv) and the HDMI/AV/tuner inputs (com.droidlogic.*), remote (tv.remote.service,
+# tvsetup.partnercustomizer), Gboard, Play Store / Services, the setup wizard (setupwraith), TvLock.
+# Already disabled before this project, left as they are: katniss, backdrop, pumpkin, tvrecommendations,
+# leanbacklauncher.recommendations, bugreportsender, mitv.gallery, xiaomi.statistic, xm.webcontent.
+
+# Telemetry
+com.miui.tv.analytics
+com.google.android.feedback
+
+# PatchWall and Xiaomi recommendations (owner: drop)
+com.mitv.tvhome.atv
+com.mitv.tvhome.oemtab
+com.mitv.tvhome.michannel
+com.mitv.tvhome.mitvplus
+
+# Play Auto Installs: lets the Play Store push Xiaomi's promoted apps onto the TV
+android.autoinstalls.config.xiaomi.amelie
+android.autoinstalls.config.xioami.dangal
+
+# Owner approved: no set-top box, preloaded apps not used
+co.sensara.tv.mitv                    # Sensy: PatchWall's live TV guide and set-top-box IR control
+co.sensara.tv.mitv.res
+com.google.android.youtube.tvmusic    # YouTube Music
+com.google.android.play.games         # Play Games
+com.google.android.videos             # Google TV / Play Movies
+com.xiaomi.mimusic2                   # Mi TV music player (local files)
+com.android.gallery3d                 # AOSP gallery
+com.android.camera2                   # camera app; the TV has no camera
+org.chromium.webview_shell            # bare WebView test browser
+com.android.printspooler              # printing
+com.android.dreams.basic              # "Colours" screensaver

@@ -32,4 +32,18 @@
         <item name="android:paddingEnd">0dp</item>
         <item name="android:drawablePadding">0dp</item>
     </style>
+
+    <!-- "NOW" / "NEXT" in the namaz pill: small, spaced capitals, quieter than the names after them. -->
+    <style name="PrayerLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">#8CFFFFFF</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:fontFamily">@font/outfit</item>
+        <item name="android:fontVariationSettings">"'wght' 600"</item>
+        <item name="android:letterSpacing">0.18</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
 </resources>
