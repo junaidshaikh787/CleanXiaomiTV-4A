@@ -37,7 +37,9 @@ Write-Host "Java $javaMajor, SDK $sdk, TV $Serial"
 
 # 2. Build, and check the result before anything goes to the TV.
 $task = if ($Debug) { 'assembleDebug' } else { 'assembleRelease' }
-& .\gradlew.bat $task -q --console=plain
+# Through cmd with stderr merged: Windows PowerShell 5.1 turns any native stderr line (javac's "Note: ... deprecated
+# API") into an error, which $ErrorActionPreference = 'Stop' makes fatal. The exit code decides instead.
+cmd /c ".\gradlew.bat $task -q --console=plain 2>&1" | Write-Host
 if ($LASTEXITCODE -ne 0) { throw "Gradle $task failed" }
 $apk = if ($Debug) { 'app\build\outputs\apk\debug\app-debug.apk' } else { 'app\build\outputs\apk\release\app-release.apk' }
 if (-not (Test-Path $apk)) { throw "build reported success but $apk is missing" }

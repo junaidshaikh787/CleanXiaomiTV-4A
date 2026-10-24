@@ -78,6 +78,10 @@
     <string name="prayer_now">الآن</string>
     <string name="prayer_now_label">الآن</string>
     <string name="prayer_next_label">التالية</string>
+    <string name="prayer_next_prayer_label">الصلاة القادمة</string>
+    <string name="prayer_adhan_at">الأذان %1$s</string>
+    <string name="prayer_adhan_at_place">الأذان %1$s · %2$s</string>
+    <string name="toggle_home_quran">سورة في الرئيسية</string>
     <string name="hijri_date_format">%1$d %2$s %3$d هـ</string>
     <string name="azan_title">الأذان</string>
     <string name="azan_at">وقت الصلاة · %1$s</string>

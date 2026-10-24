@@ -1,0 +1,9 @@
+Quran text on the Home screen (app/src/main/res/values/quran.xml)
+
+Arabic: Tanzil Quran Text (Simple), copyright (C) 2007-2024 Tanzil Project, Creative Commons Attribution 3.0.
+  Copied verbatim; changing it is not allowed. Source and updates: https://tanzil.net
+  The Basmala at the start of each surah's first ayah is stored on its own and shown before the surah; the
+  words themselves are unchanged.
+English: The Meaning of the Glorious Koran, translated by Marmaduke Pickthall (1930), in the public domain.
+
+Both were taken from https://api.alquran.cloud (editions quran-simple and en.pickthall) on 2026-10-24.

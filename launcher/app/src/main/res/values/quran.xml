@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Short surahs for the Quran card on Home (home_quran), one ayah at a time. Generated from api.alquran.cloud,
+  verbatim: Arabic from the Tanzil Quran Text (quran-simple, CC BY 3.0, https://tanzil.net), English from
+  Marmaduke Pickthall's translation (1930, public domain). The Basmala that alquran.cloud puts at the start
+  of each first ayah is kept separately (basmala_*) and shown before the surah. See QURAN-TEXT-LICENSE.txt.
+-->
+<resources>
+    <string name="basmala_ar" translatable="false">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</string>
+    <string name="basmala_en" translatable="false">In the name of Allah, the Beneficent, the Merciful.</string>
+    <!-- Surah numbers and names, in the same order as surahs_ar and surahs_en. -->
+    <integer-array name="surah_numbers">
+        <item>97</item>
+        <item>103</item>
+        <item>105</item>
+        <item>106</item>
+        <item>108</item>
+        <item>110</item>
+        <item>112</item>
+        <item>113</item>
+        <item>114</item>
+    </integer-array>
+    <string-array name="surah_names" translatable="false">
+        <item>Al-Qadr</item>
+        <item>Al-Asr</item>
+        <item>Al-Fil</item>
+        <item>Quraysh</item>
+        <item>Al-Kawthar</item>
+        <item>An-Nasr</item>
+        <item>Al-Ikhlas</item>
+        <item>Al-Falaq</item>
+        <item>An-Nas</item>
+    </string-array>
+    <array name="surahs_ar">
+        <item>@array/surah_97_ar</item>
+        <item>@array/surah_103_ar</item>
+        <item>@array/surah_105_ar</item>
+        <item>@array/surah_106_ar</item>
+        <item>@array/surah_108_ar</item>
+        <item>@array/surah_110_ar</item>
+        <item>@array/surah_112_ar</item>
+        <item>@array/surah_113_ar</item>
+        <item>@array/surah_114_ar</item>
+    </array>
+    <array name="surahs_en">
+        <item>@array/surah_97_en</item>
+        <item>@array/surah_103_en</item>
+        <item>@array/surah_105_en</item>
+        <item>@array/surah_106_en</item>
+        <item>@array/surah_108_en</item>
+        <item>@array/surah_110_en</item>
+        <item>@array/surah_112_en</item>
+        <item>@array/surah_113_en</item>
+        <item>@array/surah_114_en</item>
+    </array>
+    <string-array name="surah_97_ar" translatable="false">
+        <item>إِنَّا أَنْزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ</item>
+        <item>وَمَا أَدْرَاكَ مَا لَيْلَةُ الْقَدْرِ</item>
+        <item>لَيْلَةُ الْقَدْرِ خَيْرٌ مِنْ أَلْفِ شَهْرٍ</item>
+        <item>تَنَزَّلُ الْمَلَائِكَةُ وَالرُّوحُ فِيهَا بِإِذْنِ رَبِّهِمْ مِنْ كُلِّ أَمْرٍ</item>
+        <item>سَلَامٌ هِيَ حَتَّىٰ مَطْلَعِ الْفَجْرِ</item>
+    </string-array>
+    <string-array name="surah_97_en" translatable="false">
+        <item>Lo! We revealed it on the Night of Predestination.</item>
+        <item>Ah, what will convey unto thee what the Night of Power is!</item>
+        <item>The Night of Power is better than a thousand months.</item>
+        <item>The angels and the Spirit descend therein, by the permission of their Lord, with all decrees.</item>
+        <item>(The night is) Peace until the rising of the dawn.</item>
+    </string-array>
+    <string-array name="surah_103_ar" translatable="false">
+        <item>وَالْعَصْرِ</item>
+        <item>إِنَّ الْإِنْسَانَ لَفِي خُسْرٍ</item>
+        <item>إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ</item>
+    </string-array>
+    <string-array name="surah_103_en" translatable="false">
+        <item>By the declining day,</item>
+        <item>Lo! man is a state of loss,</item>
+        <item>Save those who believe and do good works, and exhort one another to truth and exhort one another to endurance.</item>
+    </string-array>
+    <string-array name="surah_105_ar" translatable="false">
+        <item>أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ</item>
+        <item>أَلَمْ يَجْعَلْ كَيْدَهُمْ فِي تَضْلِيلٍ</item>
+        <item>وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ</item>
+        <item>تَرْمِيهِمْ بِحِجَارَةٍ مِنْ سِجِّيلٍ</item>
+        <item>فَجَعَلَهُمْ كَعَصْفٍ مَأْكُولٍ</item>
+    </string-array>
+    <string-array name="surah_105_en" translatable="false">
+        <item>Hast thou not seen how thy Lord dealt with the owners of the Elephant?</item>
+        <item>Did He not bring their stratagem to naught,</item>
+        <item>And send against them swarms of flying creatures,</item>
+        <item>Which pelted them with stones of baked clay,</item>
+        <item>And made them like green crops devoured (by cattle)?</item>
+    </string-array>
+    <string-array name="surah_106_ar" translatable="false">
+        <item>لِإِيلَافِ قُرَيْشٍ</item>
+        <item>إِيلَافِهِمْ رِحْلَةَ الشِّتَاءِ وَالصَّيْفِ</item>
+        <item>فَلْيَعْبُدُوا رَبَّ هَٰذَا الْبَيْتِ</item>
+        <item>الَّذِي أَطْعَمَهُمْ مِنْ جُوعٍ وَآمَنَهُمْ مِنْ خَوْفٍ</item>
+    </string-array>
+    <string-array name="surah_106_en" translatable="false">
+        <item>For the taming of Qureysh.</item>
+        <item>For their taming (We cause) the caravans to set forth in winter and summer.</item>
+        <item>So let them worship the Lord of this House,</item>
+        <item>Who hath fed them against hunger and hath made them safe from fear.</item>
+    </string-array>
+    <string-array name="surah_108_ar" translatable="false">
+        <item>إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ</item>
+        <item>فَصَلِّ لِرَبِّكَ وَانْحَرْ</item>
+        <item>إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ</item>
+    </string-array>
+    <string-array name="surah_108_en" translatable="false">
+        <item>Lo! We have given thee Abundance;</item>
+        <item>So pray unto thy Lord, and sacrifice.</item>
+        <item>Lo! it is thy insulter (and not thou) who is without posterity.</item>
+    </string-array>
+    <string-array name="surah_110_ar" translatable="false">
+        <item>إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ</item>
+        <item>وَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللَّهِ أَفْوَاجًا</item>
+        <item>فَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ ۚ إِنَّهُ كَانَ تَوَّابًا</item>
+    </string-array>
+    <string-array name="surah_110_en" translatable="false">
+        <item>When Allah\'s succour and the triumph cometh</item>
+        <item>And thou seest mankind entering the religion of Allah in troops,</item>
+        <item>Then hymn the praises of thy Lord, and seek forgiveness of Him. Lo! He is ever ready to show mercy.</item>
+    </string-array>
+    <string-array name="surah_112_ar" translatable="false">
+        <item>قُلْ هُوَ اللَّهُ أَحَدٌ</item>
+        <item>اللَّهُ الصَّمَدُ</item>
+        <item>لَمْ يَلِدْ وَلَمْ يُولَدْ</item>
+        <item>وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ</item>
+    </string-array>
+    <string-array name="surah_112_en" translatable="false">
+        <item>Say: He is Allah, the One!</item>
+        <item>Allah, the eternally Besought of all!</item>
+        <item>He begetteth not nor was begotten.</item>
+        <item>And there is none comparable unto Him.</item>
+    </string-array>
+    <string-array name="surah_113_ar" translatable="false">
+        <item>قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ</item>
+        <item>مِنْ شَرِّ مَا خَلَقَ</item>
+        <item>وَمِنْ شَرِّ غَاسِقٍ إِذَا وَقَبَ</item>
+        <item>وَمِنْ شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ</item>
+        <item>وَمِنْ شَرِّ حَاسِدٍ إِذَا حَسَدَ</item>
+    </string-array>
+    <string-array name="surah_113_en" translatable="false">
+        <item>Say: I seek refuge in the Lord of the Daybreak</item>
+        <item>From the evil of that which He created;</item>
+        <item>From the evil of the darkness when it is intense,</item>
+        <item>And from the evil of malignant witchcraft,</item>
+        <item>And from the evil of the envier when he envieth.</item>
+    </string-array>
+    <string-array name="surah_114_ar" translatable="false">
+        <item>قُلْ أَعُوذُ بِرَبِّ النَّاسِ</item>
+        <item>مَلِكِ النَّاسِ</item>
+        <item>إِلَٰهِ النَّاسِ</item>
+        <item>مِنْ شَرِّ الْوَسْوَاسِ الْخَنَّاسِ</item>
+        <item>الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ</item>
+        <item>مِنَ الْجِنَّةِ وَالنَّاسِ</item>
+    </string-array>
+    <string-array name="surah_114_en" translatable="false">
+        <item>Say: I seek refuge in the Lord of mankind,</item>
+        <item>The King of mankind,</item>
+        <item>The god of mankind,</item>
+        <item>From the evil of the sneaking whisperer,</item>
+        <item>Who whispereth in the hearts of mankind,</item>
+        <item>Of the jinn and of mankind.</item>
+    </string-array>
+</resources>

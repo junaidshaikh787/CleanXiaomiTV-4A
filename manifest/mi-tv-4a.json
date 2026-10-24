@@ -137,6 +137,27 @@
                          "before":  "null",
                          "set":  "3",
                          "at":  "2026-10-24T20:25:53"
+                     },
+                     {
+                         "namespace":  "global",
+                         "key":  "window_animation_scale",
+                         "before":  "1.0",
+                         "set":  "0.5",
+                         "at":  "2026-10-24T21:23:48"
+                     },
+                     {
+                         "namespace":  "global",
+                         "key":  "transition_animation_scale",
+                         "before":  "1.0",
+                         "set":  "0.5",
+                         "at":  "2026-10-24T21:23:49"
+                     },
+                     {
+                         "namespace":  "global",
+                         "key":  "animator_duration_scale",
+                         "before":  "null",
+                         "set":  "0.5",
+                         "at":  "2026-10-24T21:23:50"
                      }
                  ],
     "home":  {

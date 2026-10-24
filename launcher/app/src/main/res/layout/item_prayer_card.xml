@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One of the six namaz times on Home (NamazPanel): a small NEXT / NOW tag, the name, the time. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:paddingStart="10dp"
+    android:paddingEnd="6dp"
+    android:gravity="center_vertical"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/prayerTag"
+        style="@style/PrayerLabel"
+        android:textSize="8sp"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/prayerCardName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textColor="#E6FFFFFF"
+        android:textSize="13sp"
+        android:fontFamily="@font/outfit"
+        android:fontVariationSettings="'wght' 400"
+        android:includeFontPadding="false" />
+
+    <TextView
+        android:id="@+id/prayerCardTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:singleLine="true"
+        android:textColor="#FFFFFFFF"
+        android:textSize="16sp"
+        android:fontFamily="@font/outfit"
+        android:fontVariationSettings="'wght' 500"
+        android:includeFontPadding="false" />
+</LinearLayout>

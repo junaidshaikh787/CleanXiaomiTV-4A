@@ -61,6 +61,10 @@ final class Config {
     /** Where prayer times are calculated; falls back to the weather coordinates when empty. */
     final String prayerLatitude;
     final String prayerLongitude;
+    /** The place name after the adhan time on Home ("Adhan at 5:22 AM · Mumbai"); empty leaves it out. */
+    final String prayerPlace;
+    /** A short surah, one ayah at a time with its translation, under the namaz times on Home. */
+    final boolean homeQuran;
     /** The Islamic (Hijri) date under the Gregorian one, from the same Aladhan answer. */
     final boolean hijriDate;
     /** Days added to Aladhan's Hijri date (-2 to 2) where the local moon sighting differs. */
@@ -90,8 +94,8 @@ final class Config {
                    int columns, int gridColumns, int rowsBelowDock, int dockOpacity,
                    boolean advancedEffects,
                    boolean shamsiDate, boolean homePrayer, boolean dreamPrayer, boolean dreamAnalog, int prayerMethod,
-                   int prayerSchool, String prayerLatitude, String prayerLongitude, boolean hijriDate, int hijriAdjustment,
-                   boolean azan, List<String> azanPrayers, boolean dreamPhotos, boolean nowPlaying, boolean homePhoto, boolean moduleCards, String vpnApp,
+                   int prayerSchool, String prayerLatitude, String prayerLongitude, String prayerPlace, boolean homeQuran,
+                   boolean hijriDate, int hijriAdjustment, boolean azan, List<String> azanPrayers, boolean dreamPhotos, boolean nowPlaying, boolean homePhoto, boolean moduleCards, String vpnApp,
                    String weatherLatitude, String weatherLongitude, String weatherPlace, boolean showHomeSettingsShortcut, int backgroundColor,
                    File wallpaper, boolean overlayApplied) {
         this.dockApps = Collections.unmodifiableList(dockApps);
@@ -114,6 +118,8 @@ final class Config {
         this.prayerSchool = prayerSchool;
         this.prayerLatitude = prayerLatitude;
         this.prayerLongitude = prayerLongitude;
+        this.prayerPlace = prayerPlace;
+        this.homeQuran = homeQuran;
         this.hijriDate = hijriDate;
         this.hijriAdjustment = hijriAdjustment;
         this.azan = azan;
@@ -159,6 +165,8 @@ final class Config {
         int prayerSchool = res.getInteger(R.integer.prayer_school);
         String prayerLat = res.getString(R.string.prayer_latitude).trim();
         String prayerLon = res.getString(R.string.prayer_longitude).trim();
+        String prayerPlace = res.getString(R.string.prayer_place).trim();
+        boolean homeQuran = res.getBoolean(R.bool.home_quran);
         boolean hijri = res.getBoolean(R.bool.hijri_date);
         int hijriAdjustment = res.getInteger(R.integer.hijri_adjustment);
         boolean azan = res.getBoolean(R.bool.azan);
@@ -201,6 +209,8 @@ final class Config {
             prayerSchool = integer(json, "prayer_school", prayerSchool, 0, 1);
             prayerLat = string(json, "prayer_latitude", prayerLat);
             prayerLon = string(json, "prayer_longitude", prayerLon);
+            prayerPlace = string(json, "prayer_place", prayerPlace);
+            homeQuran = bool(json, "home_quran", homeQuran);
             hijri = bool(json, "hijri_date", hijri);
             hijriAdjustment = integer(json, "hijri_adjustment", hijriAdjustment, -2, 2);
             azan = bool(json, "azan", azan);
@@ -219,6 +229,7 @@ final class Config {
         // Switched on the TV itself (Settings menu): wins over config.xml and a theme.
         SharedPreferences toggles = toggles(ctx);
         homePrayer = toggles.getBoolean(HOME_PRAYER, homePrayer);
+        homeQuran = toggles.getBoolean(HOME_QURAN, homeQuran);
         azan = toggles.getBoolean(AZAN, azan);
         dreamPrayer = toggles.getBoolean(DREAM_PRAYER, dreamPrayer);
         dreamAnalog = toggles.getBoolean(DREAM_ANALOG, dreamAnalog);
@@ -240,14 +251,14 @@ final class Config {
         return new Config(dock, hidden, liveTv, liveTvAction, panelService, panelAction, inputAction,
                 Math.max(1, columns), Math.max(1, gridColumns), Math.max(0, rowsBelow), Math.max(0, Math.min(100, dockOpacity)),
                 advancedEffects, shamsi, homePrayer, dreamPrayer, dreamAnalog, prayerMethod,
-                prayerSchool, prayerLat, prayerLon, hijri, Math.max(-2, Math.min(2, hijriAdjustment)),
+                prayerSchool, prayerLat, prayerLon, prayerPlace, homeQuran, hijri, Math.max(-2, Math.min(2, hijriAdjustment)),
                 azan, azanPrayers, photos, playing, homePhoto, moduleCards, vpn,
                 weatherLat, weatherLon, weatherPlace, homeSettings, background,
                 wallpaper, applied);
     }
 
     /** Keys of the switches in the Settings menu; the same names as in config.xml and config.json. */
-    static final String HOME_PRAYER = "home_prayer", DREAM_PRAYER = "dream_prayer", AZAN = "azan",
+    static final String HOME_PRAYER = "home_prayer", HOME_QURAN = "home_quran", DREAM_PRAYER = "dream_prayer", AZAN = "azan",
             DREAM_ANALOG = "dream_analog", GRID_COLUMNS = "grid_columns", ADVANCED_EFFECTS = "advanced_effects";
 
     private static SharedPreferences toggles(Context ctx) {

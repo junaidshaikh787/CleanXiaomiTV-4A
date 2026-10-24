@@ -47,7 +47,7 @@
     <bool name="shamsi_date">false</bool>
     <!-- Today's namaz times at prayer_latitude / prayer_longitude below, from Aladhan (free, no account or key;
          only the coordinates, the date, the method and the Asr school are sent, once a day).
-         home_prayer: a glass pill under the clock with the current namaz and the next one with a countdown.
+         home_prayer: a panel under the clock with the next namaz (countdown, adhan time) and the day's six times.
          dream_prayer: the day's five times on the Clock screensaver.
          Both can also be switched on the TV: Settings pill, then the rows at the bottom. -->
     <bool name="home_prayer">true</bool>
@@ -55,6 +55,11 @@
     <!-- Where namaz times are calculated (Mumbai). Empty: the weather coordinates are used instead. -->
     <string name="prayer_latitude" translatable="false">19.0760</string>
     <string name="prayer_longitude" translatable="false">72.8777</string>
+    <!-- Shown after the adhan time on Home ("Adhan at 5:22 AM · Mumbai"). Empty leaves it out. -->
+    <string name="prayer_place" translatable="false">Mumbai</string>
+    <!-- Under the namaz times on Home: a random short surah (res/values/quran.xml), one ayah at a time in
+         Arabic with Pickthall's English, a new surah after the last ayah. Needs home_prayer. -->
+    <bool name="home_quran">true</bool>
     <!-- Aladhan calculation method: 1 Karachi (University of Islamic Sciences, usual in India and Pakistan),
          3 Muslim World League, 2 ISNA (North America), 4 Umm al-Qura, 5 Egypt, 21 Morocco; the full list is
          on aladhan.com/calculation-methods. -->

@@ -125,15 +125,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     /** When the weather was last fetched (elapsedRealtime), successfully or not. */
     private long weatherAt = -WEATHER_MS;
     private boolean weatherLoading;
-    /** Prayer pill under the clock (home_prayer); switched from the Settings menu. */
-    private boolean homePrayer;
-    private String prayerLat, prayerLon;
+    /** Namaz panel under the clock (home_prayer) and its surah card (home_quran); switched from the Settings menu. */
+    private boolean homePrayer, homeQuran;
+    private String prayerLat, prayerLon, prayerPlace;
     private int prayerMethod, prayerSchool, hijriAdjustment;
     private boolean hijriOn;
-    private View prayerPill, prayerNowGroup;
-    private TextView prayerNow, hijriDate;
-    private TextView prayerName, prayerTime, prayerLeft;
-    private ImageView prayerIcon;
+    private NamazPanel namazPanel;
+    private TextView hijriDate;
     /** The last times loaded; kept past midnight until the new day's arrive, a minute out at most. */
     private Prayer.Day prayerDay;
     /** When the times were last requested (elapsedRealtime). */
@@ -287,15 +285,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             weatherUrl = "https://api.open-meteo.com/v1/forecast?latitude=" + cfg.weatherLatitude
                     + "&longitude=" + cfg.weatherLongitude + "&current=temperature_2m,weather_code,is_day&timezone=auto";
         }
-        prayerPill = findViewById(R.id.prayerPill);
-        prayerIcon = findViewById(R.id.prayerIcon);
-        prayerName = findViewById(R.id.prayerName);
-        prayerTime = findViewById(R.id.prayerTime);
-        prayerLeft = findViewById(R.id.prayerLeft);
-        prayerNowGroup = findViewById(R.id.prayerNowGroup);
-        prayerNow = findViewById(R.id.prayerNow);
         hijriDate = findViewById(R.id.hijriDate);
-        prayerPill.setBackground(new GlassDrawable(prayerPill, backdrop, 19 * density, density));
+        namazPanel = new NamazPanel(this, backdrop, density);
+        namazPanel.setOnDue(this::updatePrayer);
+        prayerPlace = cfg.prayerPlace;
+        homeQuran = cfg.homeQuran;
         // Prayer times use the prayer coordinates (Config falls back to the weather's); without any, nothing shows.
         if (!cfg.prayerLatitude.isEmpty() && !cfg.prayerLongitude.isEmpty()) {
             prayerLat = cfg.prayerLatitude;
@@ -582,6 +576,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         updateGreeting();
         updateWifiLabel();
         updateWeather();
+        namazPanel.start();
         updatePrayer();
         updateInputsButton();
         handler.postDelayed(minuteTick, MINUTE_MS);
@@ -681,6 +676,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         super.onPause();
         endDockEdit();
         handler.removeCallbacks(minuteTick);
+        namazPanel.stop();
         if (nowPlaying != null) nowPlaying.stop();
         if (nowCard != null) nowCard.stop();
         // Nothing of ours stays on screen over another app; an undecided prompt simply returns next time.
@@ -1069,6 +1065,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                 homePrayer = on;
                 updatePrayer();
             });
+            addToggleRow(rows, R.drawable.ic_prayer, R.string.toggle_home_quran, Config.HOME_QURAN, homeQuran, on -> {
+                homeQuran = on;
+                updatePrayer();
+            });
             addToggleRow(rows, R.drawable.ic_prayer, R.string.toggle_dream_prayer, Config.DREAM_PRAYER, cfg.dreamPrayer, null);
             // Read fresh: this menu's cfg is from onCreate, and the switch may have changed since.
             addToggleRow(rows, R.drawable.ic_prayer, R.string.toggle_azan, Config.AZAN, Config.load(this).azan,
@@ -1377,12 +1377,12 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     static final int PRAYER_GOLD = 0xFFF2C879;
 
     /**
-     * Updates the pill and the Islamic date every minute: the current namaz (gold), then the next one with its time
-     * and countdown. Today's times come from the saved file, or once a day from Aladhan.
+     * Updates the namaz panel and the Islamic date every minute, and when the next namaz begins (NamazPanel's own
+     * countdown). Today's times come from the saved file, or once a day from Aladhan.
      */
     private void updatePrayer() {
         if (!homePrayer) {
-            prayerPill.setVisibility(View.GONE);
+            namazPanel.hide();
             hijriDate.setVisibility(View.GONE);
             return;
         }
@@ -1396,26 +1396,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         String hijri = hijriOn ? Prayer.hijri(this, prayerDay, hijriAdjustment) : null;
         hijriDate.setText(hijri);
         hijriDate.setVisibility(hijri != null ? View.VISIBLE : View.GONE);
-        int current = Prayer.current(prayerDay);
-        if (current >= 0) {
-            prayerNow.setText(Prayer.name(this, current) + "  " + Prayer.time(this, prayerDay.minutes[current]));
-            prayerNowGroup.setVisibility(View.VISIBLE);
-        } else {
-            prayerNowGroup.setVisibility(View.GONE);
-        }
-        Prayer.Next next = Prayer.upcoming(prayerDay);
-        boolean due = next.minutesLeft <= Prayer.NOW_MINUTES;   // the last quarter hour before it
-        prayerName.setText(Prayer.name(this, next.index));
-        prayerName.setTextColor(due ? PRAYER_GOLD : 0xFFFFFFFF);
-        prayerTime.setText(Prayer.time(this, prayerDay.minutes[next.index]));
-        prayerLeft.setText(Prayer.countdown(this, next));
-        prayerLeft.setTextColor(due ? PRAYER_GOLD : 0xB3FFFFFF);
-        prayerIcon.setImageTintList(android.content.res.ColorStateList.valueOf(PRAYER_GOLD));
-        if (prayerPill.getVisibility() != View.VISIBLE) {
-            prayerPill.setAlpha(0f);
-            prayerPill.setVisibility(View.VISIBLE);
-            prayerPill.animate().alpha(1f).setDuration(400).start();
-        }
+        namazPanel.show(prayerDay, prayerPlace, homeQuran);
     }
 
     /** At most every 5 minutes while the times are missing, off the main thread. */
