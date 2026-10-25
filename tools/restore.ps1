@@ -68,6 +68,6 @@ if ($UninstallLauncher) {
 Write-Host ''
 Write-Host 'Still disabled on the TV:'
 (Invoke-Tv $Serial 'pm list packages -d').Out.Trim() | Write-Host
-Write-Host 'Manual steps, if wanted: the screensaver and Private DNS are untouched by this project; anything you changed in TV Settings yourself is not undone here.'
+Write-Host 'Manual steps, if wanted: the screensaver is untouched by this project; anything you changed in TV Settings yourself is not undone here.'
 if ($failed) { Write-Warning ('Not restored: ' + ($failed -join ', ')); exit 1 }
 Write-Host 'Restore complete.'

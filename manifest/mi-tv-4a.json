@@ -158,6 +158,20 @@
                          "before":  "null",
                          "set":  "0.5",
                          "at":  "2026-10-24T21:23:50"
+                     },
+                     {
+                         "namespace":  "global",
+                         "key":  "private_dns_specifier",
+                         "before":  "null",
+                         "set":  "dns.adguard-dns.com",
+                         "at":  "2026-10-25T14:49:07"
+                     },
+                     {
+                         "namespace":  "global",
+                         "key":  "private_dns_mode",
+                         "before":  "null",
+                         "set":  "hostname",
+                         "at":  "2026-10-25T14:49:08"
                      }
                  ],
     "home":  {
